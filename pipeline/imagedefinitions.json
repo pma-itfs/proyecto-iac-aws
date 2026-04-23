@@ -1,0 +1,6 @@
+[
+  {
+    "name": "app-container",
+    "imageUri": "128055991296.dkr.ecr.us-east-1.amazonaws.com/app-ecs-demo:latest"
+  }
+]
