@@ -1,74 +1,70 @@
-// Importamos Express para crear un servidor web simple
+/**
+ * ==========================================
+ * APP NODE.JS - VERSION PRO PARA AWS ECS
+ * Autor: Marvin A. Oviedo
+ * ==========================================
+ */
+
 const express = require('express');
-
-// Importamos mysql2 para probar la conexión con RDS
-const mysql = require('mysql2/promise');
-
-// Creamos la aplicación Express
 const app = express();
 
-// Definimos el puerto del contenedor
+// ==========================================
+// CONFIGURACIÓN
+// ==========================================
 const PORT = process.env.PORT || 3000;
+const APP_NAME = process.env.APP_NAME || "Proyecto IaC AWS";
+const VERSION = process.env.APP_VERSION || "1.0.0";
 
-// Variables de entorno para la base de datos
-const DB_HOST = process.env.DB_HOST;
-const DB_PORT = process.env.DB_PORT || 3306;
-const DB_NAME = process.env.DB_NAME;
-const DB_USER = process.env.DB_USER;
-const DB_PASSWORD = process.env.DB_PASSWORD;
+// ==========================================
+// MIDDLEWARES
+// ==========================================
+app.use(express.json());
 
-/**
- * Ruta principal
- * Sirve para validar que la aplicación está en línea
- */
+// Logger simple (útil para CloudWatch)
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// ==========================================
+// RUTAS PRINCIPALES
+// ==========================================
+
+// 🏠 Ruta raíz
 app.get('/', (req, res) => {
-  res.send('Aplicación desplegada correctamente en Amazon ECS Fargate Marvin A. Oviedo');
+  res.send(`🚀 ${APP_NAME} desplegado correctamente en Amazon ECS Fargate por Marvin A. Oviedo`);
 });
 
-/**
- * Ruta de salud
- * Esta ruta se usa para health checks del Load Balancer
- */
+// ❤️ Health Check (IMPORTANTE para ECS / Load Balancer)
 app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+  res.status(200).json({
+    status: "OK",
+    message: "Aplicación funcionando correctamente",
+    timestamp: new Date()
+  });
 });
 
-/**
- * Ruta para probar conexión a la base de datos
- * Intenta abrir una conexión a RDS y responder si todo está bien
- */
-app.get('/db-check', async (req, res) => {
-  try {
-    const connection = await mysql.createConnection({
-      host: DB_HOST,
-      port: DB_PORT,
-      user: DB_USER,
-      password: DB_PASSWORD,
-      database: DB_NAME
-    });
-
-    // Ejecutamos una consulta simple para validar conectividad
-    const [rows] = await connection.execute('SELECT NOW() AS server_time');
-
-    await connection.end();
-
-    res.json({
-      status: 'success',
-      message: 'Conexión exitosa con RDS',
-      data: rows[0]
-    });
-  } catch (error) {
-    console.error('Error conectando a la base de datos:', error.message);
-
-    res.status(500).json({
-      status: 'error',
-      message: 'No se pudo conectar a la base de datos',
-      detail: error.message
-    });
-  }
+// 📦 Información de versión
+app.get('/version', (req, res) => {
+  res.json({
+    app: APP_NAME,
+    version: VERSION,
+    author: "Marvin A. Oviedo"
+  });
 });
 
-// Levantamos el servidor
+// ❌ Manejo de rutas no encontradas
+app.use((req, res) => {
+  res.status(404).json({
+    error: "Ruta no encontrada"
+  });
+});
+
+// ==========================================
+// INICIO DEL SERVIDOR
+// ==========================================
 app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en el puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log(`📌 Nombre App: ${APP_NAME}`);
+  console.log(`📦 Versión: ${VERSION}`);
 });
