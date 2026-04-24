@@ -1,5 +1,5 @@
 # Imagen base ligera de Node.js
-FROM node:20-alpine
+FROM public.ecr.aws/docker/library/node:20-alpine
 
 # Carpeta de trabajo dentro del contenedor
 WORKDIR /usr/src/app
