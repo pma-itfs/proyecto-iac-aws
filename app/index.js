@@ -22,7 +22,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD;
  * Sirve para validar que la aplicación está en línea
  */
 app.get('/', (req, res) => {
-  res.send('Aplicación PRO desplegada correctamente en Amazon ECS Fargate');
+  res.send('Aplicación desplegada correctamente en Amazon ECS Fargate Marvin A. Oviedo');
 });
 
 /**
